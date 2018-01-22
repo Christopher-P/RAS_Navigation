@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/ras/ras-chris/catkin_ws/install_isolated/setup.sh
