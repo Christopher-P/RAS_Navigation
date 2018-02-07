@@ -5,12 +5,6 @@
     <remap from="map" to="GetMap"/>
 -->
 <launch>
-
-  
-  <arg name="odom_frame_id"   default="odom"/>
-  <arg name="base_frame_id"   default="base_link"/>
-  <arg name="global_frame_id" default="map"/>
-
  <!-- move_base -->
   <arg name="model" default="waffle"/>
   <arg name="cmd_vel_topic" default="/cmd_vel" />

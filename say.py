@@ -6,9 +6,9 @@ import std_msgs.msg
 import geometry_msgs.msg
 
 def talker():
-    rospy.init_node('RASbot')
-    pub = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=10)
 
+    pub = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=10)
+    rospy.init_node('RASbot')
 
     h = std_msgs.msg.Header()
     h.stamp = rospy.Time.now()
