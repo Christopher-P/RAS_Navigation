@@ -21,7 +21,7 @@ options = {
 
 
   map_frame = "map",
-  tracking_frame = "imu_link",
+  tracking_frame = "base_link",
   published_frame = "base_footprint",
   odom_frame = "odom",
   provide_odom_frame = true,
