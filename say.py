@@ -15,13 +15,13 @@ def talker():
     h.frame_id = "map"
 
     p = geometry_msgs.msg.Pose()
-    p.position.x = 0.236744120717
-    p.position.y = 0.00946978013963
+    p.position.x = 0.5
+    p.position.y = 0.0
     p.position.z = 0.0
 
     p.orientation.x = 0.0
     p.orientation.y = 0.0
-    p.orientation.z = 185563380068
+    p.orientation.z = 0.0
     p.orientation.w = 0.982632297443
 
     go = PoseStamped()

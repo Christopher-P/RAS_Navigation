@@ -23,8 +23,8 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 from actionlib_msgs.msg import *
 
-class GoForwardAvoid():
-    def __init__(self):
+class GoToObject():
+    def __init__(self, x, y):
         rospy.init_node('nav_test', anonymous=False)
 
 	#what to do if shut down (e.g. ctrl + C or failure)
@@ -39,16 +39,17 @@ class GoForwardAvoid():
 
 	#we'll send a goal to the robot to move 3 meters forward
 	goal = MoveBaseGoal()
-	goal.target_pose.header.frame_id = 'base_footprint'
+	goal.target_pose.header.frame_id = 'map'
 	goal.target_pose.header.stamp = rospy.Time.now()
-	goal.target_pose.pose.position.x = 0.5 #3 meters
+	goal.target_pose.pose.position.x = x
+	goal.target_pose.pose.position.y = y
 	goal.target_pose.pose.orientation.w = 1.0 #go forward
 
 	#start moving
         self.move_base.send_goal(goal)
 
 	#allow TurtleBot up to 60 seconds to complete task
-	success = self.move_base.wait_for_result(rospy.Duration(60)) 
+	success = self.move_base.wait_for_result(rospy.Duration(600)) 
 
 
 	if not success:
@@ -68,7 +69,9 @@ class GoForwardAvoid():
 
 if __name__ == '__main__':
     try:
-        GoForwardAvoid()
+        x = 0;
+        y = 0;
+        GoToObject(x, y)
     except rospy.ROSInterruptException:
         rospy.loginfo("Exception thrown")
 
