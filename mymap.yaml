@@ -1,7 +1,0 @@
-image: /home/ras/ras-chris/mymap.pgm
-resolution: 0.050000
-origin: [-1.950000, -4.399354, 0.000000]
-negate: 0
-occupied_thresh: 0.65
-free_thresh: 0.196
-
