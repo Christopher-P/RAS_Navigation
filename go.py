@@ -69,8 +69,8 @@ class GoToObject():
 
 if __name__ == '__main__':
     try:
-        x = 0;
-        y = 0;
+        x = 1.07582545927;
+        y = -0.897939106471 ;
         GoToObject(x, y)
     except rospy.ROSInterruptException:
         rospy.loginfo("Exception thrown")
