@@ -21,6 +21,10 @@
   <!-- Our LiDAR outputs scan and cartographer accepts LaserScan topic names -->
   <remap from="scan" to="LaserScan"/>
 
+<!--
+  <node name="map_server" pkg="map_server" type="map_server" args="/home/ras/ras-chris/Data/mymap.yaml">
+  </node>
+
 
   <arg name="config_file" default="/home/ras/ras-chris/WorkSpace/cartographer_params/Cartographer_params.lua"/>
 
@@ -32,7 +36,7 @@
           -pose_graph_filename /home/ras/ras-chris/Data/do.pbstream"
       output="screen">
   </node>
-
+-->
 
   <!-- The main cartographer_node, it creates a link for map->odom and provides odom data-->
   <node name="cartographer_node" pkg="cartographer_ros"
