@@ -12,37 +12,32 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+          -map_filename $(find ras_navigation)/Data/map.pbstream
 -->
 
 <!-- Modified by Christopher Pereyda for the purpose of RAS-project -->
 
 <launch>
+  <arg name="map_path" default="$(find ras_navigation)/Data/map.pbstream"/>
 
   <!-- Our LiDAR outputs scan and cartographer accepts LaserScan topic names -->
   <remap from="scan" to="LaserScan"/>
 
-<!--
-  <node name="map_server" pkg="map_server" type="map_server" args="/home/ras/ras-chris/Data/mymap.yaml">
+
+
+  <node pkg="ras_navigation" name="save_map" type="saveMap2.py" output="screen">
+    <param name="filename" value="$(arg map_path)"/>
   </node>
 
 
-  <arg name="config_file" default="/home/ras/ras-chris/WorkSpace/cartographer_params/Cartographer_params.lua"/>
-
-  <node name="cartographer_assets_writer" pkg="cartographer_rd.os" required="true"
-      type="cartographer_assets_writer" args="
-          -configuration_directory /home/ras/ras-chris/WorkSpace/cartographer_params
-          -configuration_basename Cartographer_params.lua
-
-          -pose_graph_filename /home/ras/ras-chris/Data/do.pbstream"
-      output="screen">
-  </node>
--->
 
   <!-- The main cartographer_node, it creates a link for map->odom and provides odom data-->
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
-          -configuration_basename Cartographer_params.lua"
+          -configuration_basename Cartographer_params.lua
+"
       output="screen">
   </node>
 
