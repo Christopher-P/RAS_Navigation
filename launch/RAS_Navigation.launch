@@ -13,7 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-          -map_filename $(find ras_navigation)/Data/map.pbstream
+
 -->
 
 <!-- Modified by Christopher Pereyda for the purpose of RAS-project -->
@@ -37,7 +37,7 @@
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
           -configuration_basename Cartographer_params.lua
-"
+          -map_filename $(find ras_navigation)/Data/map.pbstream"
       output="screen">
   </node>
 
