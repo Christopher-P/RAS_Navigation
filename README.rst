@@ -23,3 +23,14 @@ Configuration
 =============
 
 To configure the navigational settings, edit the files located in params. More specification on parameters can be found there.
+
+
+tf_tree
+=======
+
+For the time being, RAS_Navigation handles setting up the tf tree. The tf tree when only the navigational system is running can be seen below.
+
+.. image:: tf_tree.jpg
+   :width: 300pt
+
+When the object detection system is runnig, the camera tree will be linked to the main tree under base_link.

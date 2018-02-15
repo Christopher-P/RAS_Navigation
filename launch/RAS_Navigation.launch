@@ -36,7 +36,7 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
-          -configuration_basename Cartographer_params.lua
+          -configuration_basename RAS_cartographer_params.lua
           -map_filename $(find ras_navigation)/Data/map.pbstream"
       output="screen">
   </node>
@@ -54,7 +54,9 @@ type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
 
 
   <!-- Move base -->
-  <include file="$(find ras_navigation)/params/move_base_params/move_base_launcher.xml"/>
+  <include file="$(find ras_navigation)/launch/move_base_launcher.launch"/>
+
+
   <!-- These can be run seperatly, put here for all-in-one launch file -->
 
   <include file="$(find turtlebot3_bringup)/launch/turtlebot3_robot.launch"/>
