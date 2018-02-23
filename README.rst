@@ -17,6 +17,14 @@ Getting started
 
 To get started, simply download the RAS github package and follow the main package's installation instructions!
 
+To launch the navigational system enter:
+
+roslaunch ras_navigation RAS_Navigation
+
+To create a new map with the navigational system:
+
+roslaunch ras_navigation RAS_Navigation new_map:=true
+
 
 
 Configuration
