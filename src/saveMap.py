@@ -1,11 +1,41 @@
 #!/usr/bin/env python
-
-import os
+"""
+Save the map every so many seconds
+"""
 import time
+from datetime import datetime
+import rospy
+from cartographer_ros_msgs.srv import WriteState
 
-path = "/home/ras/catkin_ws/src/ras_navigation/Data/map.pbstream"
+def saveMap(nowTime, path, filename):
+    rospy.wait_for_service("write_state")
 
-while True:
-	time.sleep(30)
-	print("Saving map to: " + path)
-	os.system('rosservice call /write_state ' + path)
+    try:
+        #Save to current working directory
+        write = rospy.ServiceProxy("write_state", WriteState)
+
+        #Save to map storage directory
+        newPath = path + "old_maps/" + str(nowTime) + ".pbstream"
+        write(newPath)
+    except rospy.ServiceException, e:
+        rospy.roserr("Service call failed: %s" % e)
+
+if __name__ == "__main__":
+    #Used to hold time for map storage
+    nowTime = datetime.now().time()
+    rospy.init_node('saveMap')
+
+    #variables to hold params from launch file
+    filename = rospy.get_param("~filename", None)
+    path = rospy.get_param("~path", None)
+
+    #Error if no filename is specified
+    if not filename:
+        rospy.loger("File path to save map is required!")
+
+    #Do until system is turned off
+    while not rospy.is_shutdown():
+        #Save map every 30 seconds
+        time.sleep(30)
+        saveMap(nowTime, path, filename)
+        rospy.loginfo("Saved map")
