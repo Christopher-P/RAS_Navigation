@@ -14,13 +14,15 @@
   limitations under the License.
 
 
+          -map_filename $(arg init_map_path)
+
 -->
 
 <!-- Modified by Christopher Pereyda for the purpose of RAS-project -->
 
 <launch>
-  <arg name="init_map_path" default="$(find ras_navigation)/Data/init.pbstream"/>
-  <arg name="map_path" default="$(find ras_navigation)/Data/map.pbstream"/>
+  <arg name="map_path" default="$(find ras_navigation)/Data/"/>
+  <arg name="map_name" default="map.pbstream"/>
   <arg name="new_map" default="false"/>
 
   <!-- Our LiDAR outputs scan and cartographer accepts LaserScan topic names -->
@@ -32,8 +34,7 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
-          -configuration_basename RAS_cartographer_params.lua
-          -map_filename $(arg init_map_path)"
+          -configuration_basename RAS_cartographer_params.lua"
       output="screen">
   </node>
 </group>
@@ -43,7 +44,7 @@
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
           -configuration_basename RAS_cartographer_params.lua
-          -map_filename $(arg map_path)"
+          -map_filename $(arg map_path)$(arg map_name)"
       output="screen">
   </node>
 </group>
@@ -71,7 +72,8 @@ type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
 
 
   <node pkg="ras_navigation" name="save_map" type="saveMap2.py" output="screen">
-    <param name="filename" value="$(arg map_path)"/>
+    <param name="filename" value="$(arg map_name)"/>
+    <param name="path" value="$(arg map_path)"/>
   </node>
 
 
