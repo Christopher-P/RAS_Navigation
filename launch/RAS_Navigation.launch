@@ -46,7 +46,7 @@
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
           -configuration_basename RAS_cartographer_params.lua
-          -map_filename $(arg map_path)$(arg map_name)"
+          -load_state_filename $(arg map_path)$(arg map_name)"
       output="screen">
   </node>
 </group>
