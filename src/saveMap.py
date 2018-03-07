@@ -24,7 +24,7 @@ def saveMap(nowTime, path, filename):
 
 if __name__ == "__main__":
     #Used to hold time for map storage
-    nowTime = datetime.now().time().strftime("%Y-%m-%d:%H-%M-%S")
+    nowTime = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     rospy.init_node('saveMap')
 
