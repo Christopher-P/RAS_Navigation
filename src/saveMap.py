@@ -13,6 +13,8 @@ def saveMap(nowTime, path, filename):
     try:
         #Save to current working directory
         write = rospy.ServiceProxy("write_state", WriteState)
+        write(path + filename)
+
 
         #Save to map storage directory
         newPath = path + "old_maps/" + str(nowTime) + ".pbstream"
@@ -22,7 +24,8 @@ def saveMap(nowTime, path, filename):
 
 if __name__ == "__main__":
     #Used to hold time for map storage
-    nowTime = datetime.now().time()
+    nowTime = datetime.now().time().strftime("%Y-%m-%d:%H-%M-%S")
+
     rospy.init_node('saveMap')
 
     #variables to hold params from launch file
