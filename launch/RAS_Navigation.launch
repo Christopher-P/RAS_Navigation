@@ -26,6 +26,8 @@
   <arg name="map_name" default="map.pbstream"/>
   <!-- Bool variable used for deciding whether to create a new map -->
   <arg name="new_map" default="false"/>
+  <!-- Show the RViz GUI -->
+  <arg name="gui" default="false"/>
 
   <!-- Our LiDAR outputs scan and cartographer accepts LaserScan topic names -->
   <remap from="scan" to="LaserScan"/>
@@ -59,8 +61,10 @@ type="cartographer_occupancy_grid_node" args="-resolution 0.05" />
 
 
   <!-- This is just to view what is happening, good for debugging whats not working -->
+<group if="$(eval gui == true)">
   <node name="rviz" pkg="rviz" type="rviz" required="true"
      args="-d $(find ras_navigation)/params/rviz/demo_3d.rviz"/>
+</group>
 
 
   <!-- Move base -->
