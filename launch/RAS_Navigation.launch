@@ -38,8 +38,7 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
-          -configuration_basename RAS_cartographer_params.lua"
-      output="screen">
+          -configuration_basename RAS_cartographer_params.lua">
   </node>
 </group>
 
@@ -48,8 +47,7 @@
       type="cartographer_node" args="
           -configuration_directory $(find ras_navigation)/params/cartographer_params
           -configuration_basename RAS_cartographer_params.lua
-          -load_state_filename $(arg map_path)$(arg map_name)"
-      output="screen">
+          -load_state_filename $(arg map_path)$(arg map_name)">
   </node>
 </group>
 
