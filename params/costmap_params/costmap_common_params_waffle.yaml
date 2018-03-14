@@ -6,8 +6,9 @@ inflation_radius: 0.01
 cost_scaling_factor: 0.5
 map_type: costmap
 # transform_tolerance: 0.5
-observation_sources: scan
+observation_sources: scan depth
 publish_cost_grid_pc: true
 heading_scoring: true
 scan: {data_type: LaserScan, topic: scan, marking: true, clearing: true}
+depth: {data_type: PointCloud2, topic: camera/depth_registered/points, marking: true, clearing: false}
 
