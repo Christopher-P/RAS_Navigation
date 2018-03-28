@@ -2,13 +2,12 @@ global_costmap:
   global_frame: /map
   robot_base_frame: /base_scan
   update_frequency: 2.0
-  publish_frequency: 1.0
+  publish_frequency: 2.0
   static_map: false
-  width: 60.0
-  height: 60.0
-  origin_x: -30.0 
-  origin_y: -30.0
-  transform_tolerance: 9.0
 
+  transform_tolerance: 10.0
 
-
+  observation_sources: lazar #scan #depth
+#  scan: {data_type: LaserScan, topic: scan, marking: true, clearing: true}
+  lazar: {data_type: PointCloud2, topic: scan_matched_points2, marking: true, clearing: true}
+#depth: {data_type: PointCloud2, topic: camera/depth_registered/points, marking: true, clearing: false}
