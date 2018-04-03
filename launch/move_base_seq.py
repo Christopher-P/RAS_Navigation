@@ -1,14 +1,27 @@
-
-
 #!/usr/bin/env python
 import rospy
 import math
+import time
 
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from actionlib_msgs.msg import GoalStatus
 from geometry_msgs.msg import Pose, Point, Quaternion
 from tf.transformations import quaternion_from_euler
+
+from object_detection_msgs.srv import ObjectQuery, ObjectQueryResponse
+
+def get_object_location(name):
+
+    rospy.wait_for_service("query_objects")
+
+    try:
+        query = rospy.ServiceProxy("query_objects", ObjectQuery)
+        result = query(name)
+        return result.locations
+    except rospy.ServiceException, e:
+        rospy.logerr("Service call failed: %s" % e)
+    return None
 
 
 class MoveBaseSeq():
@@ -19,11 +32,11 @@ class MoveBaseSeq():
         #points_seq = rospy.get_param('move_base_seq/p_seq')
         self.pose_seq = list()
         self.goal_cnt = 0
-        n = 3
+        self.time = time.time()
+        self.time_n = 1
 
         for point in points:
             self.pose_seq.append(Pose(Point(point[0],point[1],0), Quaternion(0,0,point[2],point[3])))
-            n += 1
 
 
         #Create action client
@@ -45,6 +58,9 @@ class MoveBaseSeq():
         #To print current pose at each feedback:
         #rospy.loginfo("Feedback for goal "+str(self.goal_cnt)+": "+str(feedback))
         rospy.loginfo("Feedback for goal pose "+str(self.goal_cnt+1)+" received")
+        if (self.time + self.time_n*5 < time.time()):
+            self.time_n = self.time_n + 1
+            self.client.send_goal(self.current_goal, self.done_cb, self.active_cb, self.feedback_cb) 
 
     def done_cb(self, status, result):
         self.goal_cnt += 1
@@ -61,6 +77,7 @@ class MoveBaseSeq():
                 next_goal.target_pose.pose = self.pose_seq[self.goal_cnt]
                 rospy.loginfo("Sending goal pose "+str(self.goal_cnt+1)+" to Action Server")
                 rospy.loginfo(str(self.pose_seq[self.goal_cnt]))
+                self.current_goal = next_goal
                 self.client.send_goal(next_goal, self.done_cb, self.active_cb, self.feedback_cb) 
             else:
                 rospy.loginfo("Final goal pose reached!")
@@ -87,6 +104,7 @@ class MoveBaseSeq():
         goal.target_pose.pose = self.pose_seq[self.goal_cnt]
         rospy.loginfo("Sending goal pose "+str(self.goal_cnt+1)+" to Action Server")
         rospy.loginfo(str(self.pose_seq[self.goal_cnt]))
+        self.current_goal = goal
         self.client.send_goal(goal, self.done_cb, self.active_cb, self.feedback_cb)
         rospy.spin()
 
@@ -94,8 +112,17 @@ if __name__ == '__main__':
     try:
 	points = []
 	#points = x,y  , z,w
-	points.append((0,0,1,0))
-	points.append((0.5,0,1,0))
+        '''
+        loc = get_object_location("base1")[0]
+        points.append((loc.x, loc.y, loc.z, loc.w))
+        loc = get_object_location("b1_b2_1")[0]
+        points.append((loc.x, loc.y, loc.z, loc.w))
+        loc = get_object_location("b1_b2_2")[0]
+        points.append((loc.x, loc.y, loc.z, loc.w))
+        loc = get_object_location("base2")[0]
+        points.append((loc.x, loc.y, loc.z, loc.w))
+        '''
+        points.append((0,0.5,1,0))
         MoveBaseSeq(points)
     except rospy.ROSInterruptException:
         rospy.loginfo("Navigation finished.")
