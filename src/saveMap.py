@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""
-Save the map every so many seconds
-"""
+
+#Save the map every so many seconds
+
 import time
 from datetime import datetime
 import rospy
