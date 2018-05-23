@@ -8,9 +8,17 @@
   <arg name="odom_topic" default="odom" />
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
+ 
 
+<!-- 
+  <remap from ="/move_base/global_costmap/costmap" to="costmap_test"/>    
+ <remap from ="/move_base/local_costmap/costmap" to="costmap_test2"/>  
+
+  <remap from="map" to="/move_base/global_costmap/costmap"/>
+
+ --> 
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-
+  
     <rosparam file="$(find ras_navigation)/params/costmap_params/costmap_common_params_waffle.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find ras_navigation)/params/costmap_params/costmap_common_params_waffle.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find ras_navigation)/params/costmap_params/local_costmap_params.yaml" command="load" />
