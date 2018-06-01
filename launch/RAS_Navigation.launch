@@ -3,7 +3,7 @@
 <launch>
   <!-- Default map path and name -->
   <arg name="map_path" default="$(find ras_navigation)/Data/"/>
-  <arg name="map_name" default="casas.pbstream"/>
+  <arg name="map_name" default="\casas.pbstream"/>
 
 
   <!-- Bool variable used for deciding whether to create a new map -->

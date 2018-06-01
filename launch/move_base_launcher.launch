@@ -4,7 +4,9 @@
 <launch>
  <!-- move_base -->
   <arg name="model" default="waffle"/>
+<!-- used for removing movement but keeping navigation -->
   <arg name="cmd_vel_topic" default="/cmd_vel" />
+  <!-- <arg name="cmd_vel_topic" default="/cmd_vel_fake" /> -->
   <arg name="odom_topic" default="odom" />
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
 
