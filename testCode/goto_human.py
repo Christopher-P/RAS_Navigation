@@ -25,21 +25,21 @@ class GoToHuman():
     
     def __init__(self):
 
-        rospy.init_node('nav_test', anonymous=False)
+        rospy.init_node('nav_test_human', anonymous=False)
 
         #Listeners
         # rospy.Subscriber("tf", tf, setRAS(tf.lookupTransform("/base_link"))
         self.tf = TransformListener()
-        setRAS()
+        self.setRAS()
         # rospy.Subscriber("human/human/human", Human, setHuman(data))
 
-        locations = getLocations()
+        locations = self.getLocations()
         human = locations[0]
         RAS = locations[1]
 
         if (human==RAS): print("Incorrect") #Shouldn't be same location, means it wasn't updated from listener
         
-        msg = doMath(human.x, human.y, RAS.x, RAS.y)       
+        msg = self.doMath(human.x, human.y, RAS.x, RAS.y)       
 
         #log stuff
     	rospy.loginfo("Beginning goto_human service")
