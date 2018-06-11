@@ -16,6 +16,7 @@ import numpy as np
 from ras_msgs.srv import Check_point
 import actionlib
 from actionlib_msgs.msg import *
+from nav_msgs.msg import OccupancyGrid
 
 
 #Try class to return service, if that doesn't work do Chris' global var idea. 
@@ -30,36 +31,35 @@ class NewMap():
         self.th = threshold
         self.columns = map_obj.info.width
         self.rows = map_obj.info.height
-        self.x_offset = map_obj.info.origin.position.x
-        self.y_offset = map_obj.info.origin.position.y
-        self.origin = (-self.y_offset, -self.x_offset1)
-        self.Map = filterPoints(self, map_obj.data)
-        self.Map = np_map
+        self.x_offset = int(round(map_obj.info.origin.position.x*20))
+        self.y_offset = int(round(map_obj.info.origin.position.y*20))
+        self.origin = (-self.y_offset, -self.x_offset)
+        self.Map = self.filterPoints(map_obj.data)
+
 
     def filterPoints(self, mp):
 
-        map_points = mp.lstrip()[1:-1]
-        map_points = map(str.strip, map_points.strip().split(','))
         pointer = 0
-        np_map = np.zeros([self.rows, cself.columns], dtype=int)
+        np_map = np.zeros([self.rows, self.columns], dtype=int)
 
         for row in range(self.rows):
             for col in range(self.columns):
-                np_map[row, col] = int(map_points[pointer])
+                np_map[row, col] = int(mp[pointer])
                 pointer += 1
         
         np_map = np.flipud(np_map)
+	return np_map
 
 
     #Returns T/F for if the requested point is acceptable or not.
     def wantedPoint(self, point):
-      
-        return np.logical_and(self.getValue(point) >= 0, self.getValue(point) < self.th) #This is abnormal because numpy was having issues with the 0 < x < n being ambiguous
+
+	return np.logical_and(self.getValue(point) >= 0, self.getValue(point) < self.th) 
+	#This is abnormal because numpy was having issues with the 0 < x < n being ambiguous
 
 
     #Get the value at the requested point
-    def getValue(self, point):
-       
+    def getValue(self, point):    
         return self.Map[point]
 
 
@@ -99,8 +99,12 @@ class GetClosestPoint():
 
     def __init__(self):
 
+	global success
+	global final_point
+
+
         rospy.init_node('Check_point', anonymous=False)
-    	s = rospy.Service('Check_point', Check_point, check_it)
+    	s = rospy.Service('Check_point', Check_point, self.check_it)
     	rospy.loginfo("Beginning Check Point service")
     	rospy.spin()
 
@@ -108,16 +112,16 @@ class GetClosestPoint():
     	rospy.on_shutdown(self.shutdown)
 
     def check_it(self, given_point):
-        self.original_point = given_point
-        self.final_point = given_point
-        self.success = False
+	x = int(round(given_point.x))
+	y = int(round(given_point.y))
+	original_point = (x, y)
 
-        rospy.init_node('check point listener', anonymous=False)
-        rospy.Subscriber('map', Obj, check_map, given_point)
+        rospy.Subscriber('map', OccupancyGrid, self.check_map, original_point)
 
-        if not self.success:
+	print("After:", success, final_point)
+        if not success:
             rospy.loginfo("Failed to find correct point")
-            return "Failure", self.original_point[0], self.original_point[1]
+            return "Failure", original_point[0], original_point[1]
 
         else: 
             rospy.loginfo("Hooray, we found the next closest point")
@@ -125,19 +129,25 @@ class GetClosestPoint():
             
 
     def check_map(self, map_obj, given_point):
-            
-            threshold = 75
-            map = NewMap(map_obj, threshold)
-            point = given_point 
-            point = map.RAStoNumpy(point) 
-            acceptable = map.wantedPoint(point)
+	
+	th = 75 #=threshold
+	map = NewMap(map_obj, th)
+	point = given_point
+    	point = map.RAStoNumpy(point) 
+    	acceptable = map.wantedPoint(point)
+    	
+	if not acceptable: point = map.closestPoint(point)
 
-            if not acceptable: point = map.closestPoint(point)
+    	if map.getValue(point) < th: 
+		print("We found it, yay")
+		success = True
 
-            if map.getValue(point) < threshold: self.success = True
-            else: self.success = False
+   	else: 
+		print("we suck, boo")		
+		success = False
 
-            self.final_point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
+
+    	final_point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
 
 
     def shutdown(self):
