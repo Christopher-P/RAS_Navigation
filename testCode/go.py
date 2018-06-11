@@ -7,7 +7,7 @@
 import rospy
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
-from actionlib_msgs.msg import *
+#from actionlib_msgs.msg import *
 from ras_msgs.srv import Goto_xy
 
 def move_robot(notinput):

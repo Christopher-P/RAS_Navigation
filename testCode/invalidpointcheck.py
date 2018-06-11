@@ -14,6 +14,8 @@ The coordiates we return are in the same format as the given ones.
 import rospy, random
 import numpy as np
 from ras_msgs.srv import Check_point
+import actionlib
+from actionlib_msgs.msg import *
 
 
 #Try class to return service, if that doesn't work do Chris' global var idea. 
@@ -131,8 +133,8 @@ class GetClosestPoint():
 
     def __init__(self):
 
-        rospy.init_node('point_check', anonymous=False)
-    	s = rospy.Service('point_check', Check_point, checkIt)
+        rospy.init_node('Check_point', anonymous=False)
+    	s = rospy.Service('Check_point', Check_point, checkIt)
     	rospy.loginfo("Beginning Check Point service")
     	rospy.spin()
 
