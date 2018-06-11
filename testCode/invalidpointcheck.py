@@ -20,41 +20,7 @@ from actionlib_msgs.msg import *
 
 #Try class to return service, if that doesn't work do Chris' global var idea. 
 
-
-class CheckIt():
-
-    def __init__(self, given_point):
-        self.original_point = given_point
-        self.final_point = given_point
-        self.success = False
-
-        rospy.init_node('check point listener', anonymous=False)
-        rospy.Subscriber('map', Obj, check_map, given_point)
-
-        if not self.success:
-            rospy.loginfo("Failed to find correct point")
-            return "Failure", self.original_point[0], self.original_point[1]
-
-        else: 
-            rospy.loginfo("Hooray, we found the next closest point")
-            return "Succes", final_point[0], final_point[1]
-            
-
-    def check_map(self, map_obj, given_point):
-            
-            threshold = 75
-            map = NewMap(map_obj, threshold)
-            point = given_point 
-            point = map.RAStoNumpy(point) 
-            acceptable = map.wantedPoint(point)
-
-            if not acceptable: point = map.closestPoint(point)
-
-            if map.getValue(point) < threshold: self.success = True
-            else: self.success = False
-
-            self.final_point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
-
+    
 
 #The service
 class NewMap():
@@ -134,12 +100,45 @@ class GetClosestPoint():
     def __init__(self):
 
         rospy.init_node('Check_point', anonymous=False)
-    	s = rospy.Service('Check_point', Check_point, checkIt)
+    	s = rospy.Service('Check_point', Check_point, check_it)
     	rospy.loginfo("Beginning Check Point service")
     	rospy.spin()
 
     	#what to do if shut down (e.g. ctrl + C or failure)
     	rospy.on_shutdown(self.shutdown)
+
+    def check_it(self, given_point):
+        self.original_point = given_point
+        self.final_point = given_point
+        self.success = False
+
+        rospy.init_node('check point listener', anonymous=False)
+        rospy.Subscriber('map', Obj, check_map, given_point)
+
+        if not self.success:
+            rospy.loginfo("Failed to find correct point")
+            return "Failure", self.original_point[0], self.original_point[1]
+
+        else: 
+            rospy.loginfo("Hooray, we found the next closest point")
+            return "Succes", final_point[0], final_point[1]
+            
+
+    def check_map(self, map_obj, given_point):
+            
+            threshold = 75
+            map = NewMap(map_obj, threshold)
+            point = given_point 
+            point = map.RAStoNumpy(point) 
+            acceptable = map.wantedPoint(point)
+
+            if not acceptable: point = map.closestPoint(point)
+
+            if map.getValue(point) < threshold: self.success = True
+            else: self.success = False
+
+            self.final_point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
+
 
     def shutdown(self):
         rospy.loginfo("Ending Service")
