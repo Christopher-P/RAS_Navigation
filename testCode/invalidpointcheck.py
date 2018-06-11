@@ -16,37 +16,42 @@ import numpy as np
 from ras_msgs.srv import Check_point
 
 
-#Do service, might need to make this a class because of return values. 
-def check_point(given_point):
+#Try class to return service, if that doesn't work do Chris' global var idea. 
 
-        #Need to figure out how to do the whole assign the NewMap object here. 
-        rospy.init_node('check_point listener', anonymous=False)
-        return rospy.Subscriber("map", Object, check_map, given_point)
 
-        
+class CheckIt():
 
-def check_map(map_obj, given_point):
-        threshold = 75
-        map = NewMap(map_obj, threshold)
-        point = given_point 
-        point = map.RAStoNumpy(point) 
-        acceptable = map.wantedPoint(point)
+    def __init__(self, given_point):
+        self.original_point = given_point
+        self.final_point = given_point
+        self.success = False
 
-        if not acceptable: point = map.closestPoint(point)
+        rospy.init_node('check point listener', anonymous=False)
+        rospy.Subscriber('map', Obj, check_map, given_point)
 
-        if map.getValue(point) < threshold: success = True
-        else: success = False
+        if not self.success:
+            rospy.loginfo("Failed to find correct point")
+            return "Failure", self.original_point[0], self.original_point[1]
 
-        point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
-
-        if not success:
-            rospy.loginfo("Failed to find a correct point")
-            return "Failure", given_point #Return original point? will figure out.   
-
-        else:
+        else: 
             rospy.loginfo("Hooray, we found the next closest point")
-            return "Success", point[0], point[1]
+            return "Succes", final_point[0], final_point[1]
+            
 
+    def check_map(self, map_obj, given_point):
+            
+            threshold = 75
+            map = NewMap(map_obj, threshold)
+            point = given_point 
+            point = map.RAStoNumpy(point) 
+            acceptable = map.wantedPoint(point)
+
+            if not acceptable: point = map.closestPoint(point)
+
+            if map.getValue(point) < threshold: self.success = True
+            else: self.success = False
+
+            self.final_point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
 
 
 #The service
@@ -127,7 +132,7 @@ class GetClosestPoint():
     def __init__(self):
 
         rospy.init_node('point_check', anonymous=False)
-    	s = rospy.Service('point_check', Check_point, check_point)
+    	s = rospy.Service('point_check', Check_point, checkIt)
     	rospy.loginfo("Beginning Check Point service")
     	rospy.spin()
 
