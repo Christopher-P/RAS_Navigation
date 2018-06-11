@@ -11,8 +11,7 @@ The coordiates we return are in the same format as the given ones.
 '''
 
 
-import rospy
-import random
+import rospy, random, time
 import numpy as np
 from ras_msgs.srv import Check_point
 import actionlib
@@ -95,10 +94,13 @@ class NewMap():
 #Start service
 class GetClosestPoint():
 
-    global success
-    global final_point
+
+
 
     def __init__(self):
+	self.success = None
+	self.final_point = None
+	self.sub = None
 
         rospy.init_node('Check_point', anonymous=False)
     	s = rospy.Service('Check_point', Check_point, self.check_it)
@@ -109,21 +111,20 @@ class GetClosestPoint():
     	rospy.on_shutdown(self.shutdown)
 
     def check_it(self, given_point):
-	    x = int(round(given_point.x))
-	    y = int(round(given_point.y))
-	    original_point = (x, y)
+    	x = int(round(given_point.x))
+    	y = int(round(given_point.y))
+    	original_point = (x, y)
 
-        rospy.Subscriber('map', OccupancyGrid, self.check_map, original_point)
+        self.sub = rospy.Subscriber('map', OccupancyGrid, self.check_map, original_point)
+	time.sleep(1)
 
-	print("After:", success, final_point)
-
-        if not success:
+        if not self.success:
             rospy.loginfo("Failed to find correct point")
             return "Failure", original_point[0], original_point[1]
 
         else: 
             rospy.loginfo("Hooray, we found the next closest point")
-            return "Succes", final_point[0], final_point[1]
+            return "Succes", self.final_point[0], self.final_point[1]
             
 
     def check_map(self, map_obj, given_point):
@@ -136,16 +137,18 @@ class GetClosestPoint():
     	
 	if not acceptable: point = map.closestPoint(point)
 
-    	if map.getValue(point) < th: 
-		print("We found it, yay")
-		success = True
+    	if map.getValue(point) < th:
+		print("Success", map.getValue(point), point) 
+		self.success = True
+		self.final_point = map.NumpytoRAS(point) #Give back as something RAS can understand.
+		self.sub.unregister() 
+		return
+   	else:
+		self.success = False
+		self.sub.unregister()
+		return
 
-   	else: 
-		print("we suck, boo")		
-		success = False
-
-
-    	final_point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
+    	
 
 
     def shutdown(self):
