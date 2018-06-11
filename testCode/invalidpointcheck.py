@@ -13,59 +13,70 @@ The coordiates we return are in the same format as the given ones.
 
 import rospy, random
 import numpy as np
-
- 
-class NewMap():
+from ras_msgs.srv import Check_point
 
 
-    #Given the text file of the map we find all the needed data.
-    def __init__(self, m_file, th):
+#Do service, might need to make this a class because of return values. 
+def check_point(given_point):
 
-        self.th, self.m_file = th, m_file
-        self.Map, self.origin, self.columns, self.rows, self.y_offset, self.x_offset = self.process(self.m_file)
+        #Need to figure out how to do the whole assign the NewMap object here. 
+        rospy.init_node('check_point listener', anonymous=False)
+        return rospy.Subscriber("map", Object, check_map, given_point)
 
         
-    #Process the file to get the needed data. 
-    def process(self, m_file):
-       
-        with open("mapmap.txt") as map_file:
 
-            xy_flag = False
-           
-            for line in map_file:
-               
-                name_info = line.lstrip().rstrip().split(":")
-         
-                if name_info[0] == "width": cols = int(name_info[1]) #width of map
-                
-                elif name_info[0] == "height": rows = int(name_info[1]) #Height of map
+def check_map(map_obj, given_point):
+        threshold = 75
+        map = NewMap(map_obj, threshold)
+        point = given_point 
+        point = map.RAStoNumpy(point) 
+        acceptable = map.wantedPoint(point)
 
-                elif name_info[0] == "data": #Get all of the points in the map and format them in numpy
-                   
-                    raw_data = name_info[1].lstrip()[1:-1]
-                    raw_data_list = map(str.strip, raw_data.strip().split(','))
-                    pointer = 0
-                    np_map = np.zeros([rows, cols], dtype=int)
+        if not acceptable: point = map.closestPoint(point)
 
-                    for row in range(rows): 
-                        for col in range(cols):
-                         
-                            np_map[row, col] = int(raw_data_list[pointer])
-                            pointer += 1
+        if map.getValue(point) < threshold: success = True
+        else: success = False
 
-                elif name_info[0] == "position": xy_flag = True #Set flag to get correct xy, instead of the orientation xy.
+        point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
 
-                elif xy_flag and name_info[0]=="x": xo = int(round(float(name_info[1]) * 20)) #set x offset
+        if not success:
+            rospy.loginfo("Failed to find a correct point")
+            return "Failure", given_point #Return original point? will figure out.   
 
-                elif xy_flag and name_info[0]=="y":
-                 
-                    yo = int(round(float(name_info[1]) * 20)) #set y offset
-                    xy_flag = False #Set so we don't overwrite the correct xy
-            
-        np_map = np.flipud(np_map) #Flip it to set it up properly for the math implimented
-        org = (-yo, -xo) #Set origin
-        return np_map, org, cols, rows, yo, xo
-   
+        else:
+            rospy.loginfo("Hooray, we found the next closest point")
+            return "Success", point[0], point[1]
+
+
+
+#The service
+class NewMap():
+
+    #Given the text file of the map we find all the needed data.
+    def __init__(self, map_obj, threshold):
+        self.th = threshold
+        self.columns = map_obj.info.width
+        self.rows = map_obj.info.height
+        self.x_offset = map_obj.info.origin.position.x
+        self.y_offset = map_obj.info.origin.position.y
+        self.origin = (-self.y_offset, -self.x_offset1)
+        self.Map = filterPoints(self, map_obj.data)
+        self.Map = np_map
+
+    def filterPoints(self, mp):
+
+        map_points = mp.lstrip()[1:-1]
+        map_points = map(str.strip, map_points.strip().split(','))
+        pointer = 0
+        np_map = np.zeros([self.rows, cself.columns], dtype=int)
+
+        for row in range(self.rows):
+            for col in range(self.columns):
+                np_map[row, col] = int(map_points[pointer])
+                pointer += 1
+        
+        np_map = np.flipud(np_map)
+
 
     #Returns T/F for if the requested point is acceptable or not.
     def wantedPoint(self, point):
@@ -109,23 +120,31 @@ class NewMap():
        
         return (point[1] + self.x_offset, point[0] + self.y_offset)
 
-                      
+
+#Start service
+class GetClosestPoint():
+
+    def __init__(self):
+
+        rospy.init_node('point_check', anonymous=False)
+    	s = rospy.Service('point_check', Check_point, check_point)
+    	rospy.loginfo("Beginning Check Point service")
+    	rospy.spin()
+
+    	#what to do if shut down (e.g. ctrl + C or failure)
+    	rospy.on_shutdown(self.shutdown)
+
+    def shutdown(self):
+        rospy.loginfo("Ending Service")
+
+
+
 if __name__ == '__main__':
    
     try:
-   
-        map_file = "mapmap.txt" ### CHANGE WITH RAS DATA
-        threshold = 75
-        map = NewMap(map_file, threshold) 
-        point = (58, 19) ###CHANGE WITH RAS DATA
-        point = map.RAStoNumpy(point) 
-        acceptable = map.wantedPoint(point)
 
-        if not acceptable: point = map.closestPoint(point)
-
-        point = map.NumpytoRAS(point) #Give back as something RAS can understand. 
-        print(point)        
-
+        GetClosestPoint()
+       
     except rospy.ROSInterruptException:
 
         rospy.loginfo("Exception thrown")
