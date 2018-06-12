@@ -10,11 +10,7 @@ Return good debugging messages
 
 import rospy
 import collections
-# from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-# import actionlib
-# from actionlib_msgs.msg import *
-# from ras_msgs.srv import Goto_human
-from ras_msgs.srv import Goto_xy
+from ras_msgs.srv import Goto_xy, Rotate
 from tf import TransformListener
 
 
@@ -24,11 +20,10 @@ class GoToHuman():
     global lastknown_RAS
     global lastknown_quat
     lastknown_quat = 0.0
-    lastknown_human = (2.0, 2.0)
+    lastknown_human = (1.0, 1.0)
     lastknown_RAS = (0.0, 0.0)
 
     def __init__(self):
-
 
 
         rospy.init_node('nav_test_human', anonymous=False)
@@ -43,6 +38,7 @@ class GoToHuman():
         human = locations[0]
         RAS = locations[1]
         quat = locations[2]
+
 
         if (human==RAS): print("Incorrect") #Shouldn't be same location, means it wasn't updated from listener
 
@@ -67,7 +63,7 @@ class GoToHuman():
         goto_human = rospy.ServiceProxy('goto_xy', Goto_xy)
 
         rospy.wait_for_service('rotate') #wait for service to start, need to start yourself (run file)
-        rotate_to_human = rospy.ServiceProxy('rorate', Rotate)
+        rotate_to_human = rospy.ServiceProxy('rotate', Rotate)
 
         if ((h_x == r_x) or (h_y == r_y)):
 

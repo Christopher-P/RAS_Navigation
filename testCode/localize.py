@@ -2,10 +2,14 @@
 
 
 
-import rospy, math, time, sys, os
+import rospy, math, time, sys, os, collections
 from tf import TransformListener
 from ras_msgs.srv import Localize
 
+def publish_localizing(notinput):
+    pub = rospy.Publisher('localized', std_msgs.msg.String, queue_size=10)
+    pub.publish(std_msgs.msg.String("True"))
+    return "True"
 
 #Localize class to find information between two points
 class Localize():
@@ -46,30 +50,33 @@ class RAS():
 
     def __init__(self):
         self.tf = TransformListener()
-        self.pos, self.time = self.getRAS()
+	self.pos = 0
+        self.getRAS()
+	self.time = time.time()
 
     def getRAS(self):
-        #Time reasoning, I am going to grab the time at the same moment I'm asking RAS where it is located
-        #This way we're not relying on RAS' clock to be correct constantly. It should be indepdent of that
-        #Same as in goto_human
+	self.tf.waitForTransform("/base_link", "/map", rospy.Time(), rospy.Duration(10.0))
         if self.tf.frameExists("/base_link") and self.tf.frameExists("/map"):
             t = self.tf.getLatestCommonTime("/base_link", "/map")
             position, quaternion = self.tf.lookupTransform("/base_link", "/map", t) 
-            return (position, time.time())
-    
+	    self.pos = (position[0], position[1])
+
+	else:
+	    print("Something is wrong here...")
+		
+
     def getValues(self):
         return (self.pos, self.time)
 
 
 
-def publish_localizing(notinput):
-    pub = rospy.Publisher('localized', std_msgs.msg.String, queue_size=10)
-    pub.publish(std_msgs.msg.String("True"))
 
 
 if __name__ == '__main__':
    
     try: 
+
+        rospy.init_node('nav_test_localize', anonymous=False)
         original = RAS() #Get original RAS location
         starting_pos, starting_time = original.getValues()
         local = Localize(starting_pos[0], starting_pos[1], starting_time) #set the local position to this thing and time
@@ -89,18 +96,11 @@ if __name__ == '__main__':
                 finished = True
         
         #Service Stuff
-        rospy.init_node('nav_test_localize', anonymous=False)
+
     	s = rospy.Service('localize', Localize, publish_localizing)
     	rospy.loginfo("Reporting localized service")
     	rospy.spin()
         rospy.on_shutdown(rospy.loginfo("Ending Service"))
-
-
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(exc_type, fname, exc_tb.tb_lineno)
-        print(e)
 
     except rospy.ROSInterruptException:
         rospy.loginfo("Exception thrown")

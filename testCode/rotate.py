@@ -4,6 +4,7 @@ import rospy
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 from actionlib_msgs.msg import *
+from ras_msgs.srv import Rotate
 
 def rotate_robot(notinput):
     #tell the action client that we want to spin a thread by default
