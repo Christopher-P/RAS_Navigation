@@ -7,10 +7,15 @@ Currently having issues with tf not working to receive the information
 for his current location. Going to try nested class.  
 '''
 
+
+
+
+
 import rospy, math, time, sys, os
 from tf import TransformListener
 from ras_msgs.srv import Localize
 from std_msgs.msg import String
+from tf import tfMessage
 
 
 class LocIt:
@@ -108,18 +113,33 @@ class LocIt:
 
 		def getRAS(self):
 
-			tf = TransformListener()
-			tf.waitForTransform("/base_link", "/map", rospy.Time(), rospy.Duration(1.0))			
-			finding = True
-			count = 0
-			while finding:
-				count += 1
-				tf.waitForTransform("/base_link", "/map", rospy.Time(), rospy.Duration(1.0))
-				(trans, rot)=tf.lookupTransform("/base_link", "/map", rospy.Time())
-				self.pos = (trans[0], trans[1])
-				self.thyme = time.time()
-				if self.pos is not None:
-					finding = False
+			sub = rospy.Subscriber('tf', tfMessage, self.getPOSThyme)
+
+		def getPOSThyme(self, tf_msg):
+			
+			for pose in tf_msg:
+				if pose.child_frame_id == "base_link":
+					(trans, rot) = pose.transform
+					print ("Yay we found it")
+					self.pos = (trans[0], trans[1])
+					self.thyme = time.time()
+				
+
+
+			
+
+			# tf = TransformListener()
+			# tf.waitForTransform("/base_link", "/map", rospy.Time(), rospy.Duration(1.0))			
+			# finding = True
+			# count = 0
+			# while finding:
+			# 	count += 1
+			# 	tf.waitForTransform("/base_link", "/map", rospy.Time(), rospy.Duration(1.0))
+			# 	(trans, rot)=tf.lookupTransform("/base_link", "/map", rospy.Time())
+			# 	self.pos = (trans[0], trans[1])
+			# 	self.thyme = time.time()
+			# 	if self.pos is not None:
+			# 		finding = False
 
 
 			

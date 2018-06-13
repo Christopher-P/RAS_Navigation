@@ -59,11 +59,11 @@ class GoToHuman():
 
         #Do math, given location A and B, straight line between the two with 2ft gap between
 
-        rospy.wait_for_service('goto_xy') #wait for service to start, need to start yourself (run file)
-        goto_human = rospy.ServiceProxy('goto_xy', Goto_xy)
+        # rospy.wait_for_service('goto_xy') #wait for service to start, need to start yourself (run file)
+        # goto_human = rospy.ServiceProxy('goto_xy', Goto_xy)
 
-        rospy.wait_for_service('rotate') #wait for service to start, need to start yourself (run file)
-        rotate_to_human = rospy.ServiceProxy('rotate', Rotate)
+        # rospy.wait_for_service('rotate') #wait for service to start, need to start yourself (run file)
+        # rotate_to_human = rospy.ServiceProxy('rotate', Rotate)
 
         if ((h_x == r_x) or (h_y == r_y)):
 

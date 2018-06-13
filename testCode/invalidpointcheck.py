@@ -116,7 +116,7 @@ class GetClosestPoint():
     	original_point = (x, y)
 
         self.sub = rospy.Subscriber('map', OccupancyGrid, self.check_map, original_point)
-	time.sleep(1)
+	    #time.sleep(1)
 
         if not self.success:
             rospy.loginfo("Failed to find correct point")
