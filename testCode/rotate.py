@@ -37,7 +37,7 @@ def rotate_robot(points):
     else:
         quad = 1
 
-    theta = get_theta(quad, x2, y2) #Get angle, rads
+    theta = get_theta(quad, abs(x2), abs(y2)) #Get angle, rads
     
     rospy.loginfo("New rads:" + str(theta))
 
@@ -50,6 +50,7 @@ def rotate_robot(points):
     q_new = quaternion_multiply(q_rot, q_orgin) #do some kind of magic
 
     rospy.loginfo("New rotation " + str(q_new))
+    
 
     #tell the action client that we want to spin a thread by default
     move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)
@@ -95,6 +96,7 @@ def get_theta(quad, x2, y2):
         theta = math.atan(y2/x2) #No adjustment for Q1
        
     elif quad == 2 or quad == 4:
+        
         theta = math.atan(x2/y2)
         if quad == 2: 
             theta = theta + 1.5707963268 #Adjust for being in Q2, pi/2
