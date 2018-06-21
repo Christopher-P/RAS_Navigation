@@ -10,7 +10,7 @@ import actionlib
 #from actionlib_msgs.msg import *
 from ras_msgs.srv import Goto_xy
 
-def move_robot(notinput):
+def move_robot(points):
     #tell the action client that we want to spin a thread by default
     move_base = actionlib.SimpleActionClient("move_base", MoveBaseAction)
     rospy.loginfo("wait for the action server to come up")
@@ -21,8 +21,8 @@ def move_robot(notinput):
     goal = MoveBaseGoal()
     goal.target_pose.header.frame_id = 'map'
     goal.target_pose.header.stamp = rospy.Time.now()
-    goal.target_pose.pose.position.x = notinput.x
-    goal.target_pose.pose.position.y = notinput.y
+    goal.target_pose.pose.position.x = points.x
+    goal.target_pose.pose.position.y = points.y
     goal.target_pose.pose.orientation.w = 1.0 #go forward
 
     #start moving

@@ -46,7 +46,7 @@ def rotate_robot(points):
     rospy.loginfo("New degrees:" + str(deg))
     #roll pitch yaw -- I think it needs to be yaw.
     q_orgin = quaternion_from_euler(0, 0, 0) #set him to the original
-    q_rot = quaternion_from_euler(0, 0, theta) #set new one
+    q_rot = quaternion_from_euler(0, 0, theta) #set new one. Try different spots. 
     q_new = quaternion_multiply(q_rot, q_orgin) #do some kind of magic
 
     rospy.loginfo("New rotation " + str(q_new))
