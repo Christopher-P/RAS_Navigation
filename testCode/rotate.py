@@ -14,48 +14,7 @@ from geometry_msgs.msg import Twist
 
 def rotate_robot(points):
 	
-    #Starts a new node
-    rospy.init_node('robot_cleaner', anonymous=True)
-    velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
-    vel_msg = Twist()
-
-    # Receiveing the user's input
-    print("Let's rotate your robot")
-    speed = 30
-    angle = 75
-    clockwise = 0
-
-    #Converting from angles to radians
-    angular_speed = speed*2*PI/360
-    relative_angle = angle*2*PI/360
-
-    #We wont use linear components
-    vel_msg.linear.x=0
-    vel_msg.linear.y=0
-    vel_msg.linear.z=0
-    vel_msg.angular.x = 0
-    vel_msg.angular.y = 0
-
-    # Checking if our movement is CW or CCW
-    if clockwise:
-        vel_msg.angular.z = -abs(angular_speed)
-    else:
-        vel_msg.angular.z = abs(angular_speed)
-
-    # Setting the current time for distance calculus
-    t0 = rospy.Time.now().to_sec()
-    current_angle = 0
-
-    while(current_angle < relative_angle):
-        velocity_publisher.publish(vel_msg)
-        t1 = rospy.Time.now().to_sec()
-        current_angle = angular_speed*(t1-t0)
-
-    #Forcing our robot to stop
-    vel_msg.angular.z = 0
-    velocity_publisher.publish(vel_msg)
-    rospy.spin()
-'''
+   
     #original points
     x = points.x1
     y = points.y1
@@ -105,11 +64,17 @@ def rotate_robot(points):
     goal = MoveBaseGoal()
     goal.target_pose.header.frame_id = 'map'
     goal.target_pose.header.stamp = rospy.Time.now()
+
     #Rotate
-    goal.target_pose.pose.orientation.x = 0.25
-    goal.target_pose.pose.orientation.y = 0.25
-    goal.target_pose.pose.orientation.z = 0.25
-    goal.target_pose.pose.orientation.w = 0.25
+    goal.target_pose.pose.orientation.x = q_new[2]
+    goal.target_pose.pose.orientation.y = q_new[1]
+    goal.target_pose.pose.orientation.z = q_new[0]
+    goal.target_pose.pose.orientation.w = q_new[3]
+
+    goal.target_pose.pose.position.x = 0.0
+    goal.target_pose.pose.position.y = 0.0
+    goal.target_pose.pose.position.z = 0.0
+    
 
     #start moving
     move_base.send_goal(goal)
@@ -130,7 +95,7 @@ def rotate_robot(points):
             rospy.loginfo("Hooray, the base rotated")
         return "Success"
      
-'''
+
 def get_theta(quad, x2, y2):
 
     theta = 0
