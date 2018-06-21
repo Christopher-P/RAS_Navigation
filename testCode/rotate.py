@@ -14,42 +14,46 @@ from geometry_msgs.msg import Twist
 
 def rotate_robot(points):
 	
+    #Starts a new node
     rospy.init_node('robot_cleaner', anonymous=True)
-    elocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
-    PI = 3.1415926535897
+    velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
     vel_msg = Twist()
+
+    # Receiveing the user's input
+    print("Let's rotate your robot")
     speed = 30
     angle = 75
-    clockwise = False
+    clockwise = 0
 
+    #Converting from angles to radians
     angular_speed = speed*2*PI/360
     relative_angle = angle*2*PI/360
-   
+
     #We wont use linear components
     vel_msg.linear.x=0
     vel_msg.linear.y=0
     vel_msg.linear.z=0
     vel_msg.angular.x = 0
     vel_msg.angular.y = 0
-   
-      # Checking if our movement is CW or CCW
+
+    # Checking if our movement is CW or CCW
     if clockwise:
-       vel_msg.angular.z = -abs(angular_speed)
+        vel_msg.angular.z = -abs(angular_speed)
     else:
-       vel_msg.angular.z = abs(angular_speed)
-     # Setting the current time for distance calculus
+        vel_msg.angular.z = abs(angular_speed)
+
+    # Setting the current time for distance calculus
     t0 = rospy.Time.now().to_sec()
     current_angle = 0
-   
+
     while(current_angle < relative_angle):
-       rospy.loginfo(vel_msg)
-       t1 = rospy.Time.now().to_sec()
-       current_angle = angular_speed*(t1-t0)
-   
-   
-   #Forcing our robot to stop
+        velocity_publisher.publish(vel_msg)
+        t1 = rospy.Time.now().to_sec()
+        current_angle = angular_speed*(t1-t0)
+
+    #Forcing our robot to stop
     vel_msg.angular.z = 0
-    rospy.loginfo(vel_msg)
+    velocity_publisher.publish(vel_msg)
     rospy.spin()
 '''
     #original points
@@ -105,7 +109,7 @@ def rotate_robot(points):
     goal.target_pose.pose.orientation.x = 0.25
     goal.target_pose.pose.orientation.y = 0.25
     goal.target_pose.pose.orientation.z = 0.25
-    goal.target_pose.pose.orientation.x = 0.25
+    goal.target_pose.pose.orientation.w = 0.25
 
     #start moving
     move_base.send_goal(goal)
