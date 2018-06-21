@@ -9,10 +9,49 @@ from ras_msgs.srv import Rotate
 from tf.msg import tfMessage
 from tf.transformations import quaternion_from_euler
 from tf.transformations import quaternion_multiply
+from geometry_msgs.msg import Twist
 
 
 def rotate_robot(points):
+	
+    rospy.init_node('robot_cleaner', anonymous=True)
+    elocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
+    PI = 3.1415926535897
+    vel_msg = Twist()
+    speed = 30
+    angle = 75
+    clockwise = False
 
+    angular_speed = speed*2*PI/360
+    relative_angle = angle*2*PI/360
+   
+    #We wont use linear components
+    vel_msg.linear.x=0
+    vel_msg.linear.y=0
+    vel_msg.linear.z=0
+    vel_msg.angular.x = 0
+    vel_msg.angular.y = 0
+   
+      # Checking if our movement is CW or CCW
+    if clockwise:
+       vel_msg.angular.z = -abs(angular_speed)
+    else:
+       vel_msg.angular.z = abs(angular_speed)
+     # Setting the current time for distance calculus
+    t0 = rospy.Time.now().to_sec()
+    current_angle = 0
+   
+    while(current_angle < relative_angle):
+       rospy.loginfo(vel_msg)
+       t1 = rospy.Time.now().to_sec()
+       current_angle = angular_speed*(t1-t0)
+   
+   
+   #Forcing our robot to stop
+    vel_msg.angular.z = 0
+    rospy.loginfo(vel_msg)
+    rospy.spin()
+'''
     #original points
     x = points.x1
     y = points.y1
@@ -46,7 +85,7 @@ def rotate_robot(points):
     rospy.loginfo("New degrees:" + str(deg))
     #roll pitch yaw -- I think it needs to be yaw.
     q_orgin = quaternion_from_euler(0, 0, 0) #set him to the original
-    q_rot = quaternion_from_euler(0, 0, theta) #set new one. Try different spots. 
+    q_rot = quaternion_from_euler(theta, 0, 0) #set new one. Try different spots. 
     q_new = quaternion_multiply(q_rot, q_orgin) #do some kind of magic
 
     rospy.loginfo("New rotation " + str(q_new))
@@ -63,10 +102,10 @@ def rotate_robot(points):
     goal.target_pose.header.frame_id = 'map'
     goal.target_pose.header.stamp = rospy.Time.now()
     #Rotate
-    goal.target_pose.pose.orientation.x = q_new[0]
-    goal.target_pose.pose.orientation.y = q_new[1]
-    goal.target_pose.pose.orientation.z = q_new[2]
-    goal.target_pose.pose.orientation.x = q_new[3]
+    goal.target_pose.pose.orientation.x = 0.25
+    goal.target_pose.pose.orientation.y = 0.25
+    goal.target_pose.pose.orientation.z = 0.25
+    goal.target_pose.pose.orientation.x = 0.25
 
     #start moving
     move_base.send_goal(goal)
@@ -87,7 +126,7 @@ def rotate_robot(points):
             rospy.loginfo("Hooray, the base rotated")
         return "Success"
      
-
+'''
 def get_theta(quad, x2, y2):
 
     theta = 0

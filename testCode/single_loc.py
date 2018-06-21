@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 '''
 The idea of this is to let RAS know when he is localized or not. 
 This is a service you want to call and return a T/F message. 
@@ -15,7 +14,7 @@ import rospy, math, time, sys, os
 from tf import TransformListener
 from ras_msgs.srv import Localize
 from std_msgs.msg import String
-from tf import tfMessage
+from tf.msg import tfMessage
 
 
 class LocIt:
@@ -116,13 +115,15 @@ class LocIt:
 			sub = rospy.Subscriber('tf', tfMessage, self.getPOSThyme)
 
 		def getPOSThyme(self, tf_msg):
-			
-			for pose in tf_msg:
-				if pose.child_frame_id == "base_link":
-					(trans, rot) = pose.transform
-					print ("Yay we found it")
-					self.pos = (trans[0], trans[1])
-					self.thyme = time.time()
+			print(tf_msg[0])
+
+	
+			#for pose in tf_msg:
+			#if tf_msg.transforms.child_frame_id == "base_link":
+			#	(trans, rot) = pose.transform
+			#	print ("Yay we found it")
+			#	self.pos = (trans[0], trans[1])
+			#	self.thyme = time.time()
 				
 
 
