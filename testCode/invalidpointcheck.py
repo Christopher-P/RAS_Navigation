@@ -19,9 +19,6 @@ from actionlib_msgs.msg import *
 from nav_msgs.msg import OccupancyGrid
 
 
-#Try class to return service, if that doesn't work do Chris' global var idea.
-
-
 #The service
 class NewMap():
 
