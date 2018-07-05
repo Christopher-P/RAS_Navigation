@@ -48,7 +48,7 @@ def move_robot(notinput):
 
 class GoToObject():
     def __init__(self):
-        rospy.init_node('nav_test', anonymous=False)
+        # rospy.init_node('nav_test', anonymous=False)
     	s = rospy.Service('goto_xy', Goto_xy, move_robot)
     	rospy.loginfo("Beginning goto_xy service")
     	rospy.spin()
