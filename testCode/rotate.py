@@ -23,7 +23,6 @@ from tf.transformations import quaternion_multiply
 
 
 def rotate_robot(points):
-	   
     #original points.
     x = points.x1
     y = points.y1
@@ -85,8 +84,8 @@ def rotate_robot(points):
 
         # We made it!
         state = move_base.get_state()
-        if state == GoalStatus.SUCCEEDED:
-            rospy.loginfo("Hooray, the base rotated")
+        #if state == GoalStatus.SUCCEEDED:
+        rospy.loginfo("Hooray, the base rotated")
         return "Success"
      
 
