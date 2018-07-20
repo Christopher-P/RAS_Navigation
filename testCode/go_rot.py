@@ -8,7 +8,7 @@ import rospy
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 #from actionlib_msgs.msg import *
-from ras_msgs.srv import Goto_xy
+from ras_msgs.srv import Goto_xywz
 
 def move_robot(points):
     #tell the action client that we want to spin a thread by default
@@ -23,7 +23,8 @@ def move_robot(points):
     goal.target_pose.header.stamp = rospy.Time.now()
     goal.target_pose.pose.position.x = points.x
     goal.target_pose.pose.position.y = points.y
-    goal.target_pose.pose.orientation.w = 1.0 #go forward
+    goal.target_pose.pose.orientation.w = points.w #go forward
+    goal.target_pose.pose.orientation.z = points.z
 
     #start moving
     move_base.send_goal(goal)
@@ -40,8 +41,8 @@ def move_robot(points):
     else:
         # We made it!
         state = move_base.get_state()
-        if state == GoalStatus.SUCCEEDED:
-            rospy.loginfo("Hooray, the base moved 3 meters forward")
+        # if state == GoalStatus.SUCCEEDED:
+        rospy.loginfo("Hooray, the base moved 3 meters forward")
         return "Success"
         
 
@@ -49,7 +50,7 @@ def move_robot(points):
 class GoToObject():
     def __init__(self):
         rospy.init_node('nav_test', anonymous=False)
-    	s = rospy.Service('goto_xy', Goto_xy, move_robot)
+    	s = rospy.Service('goto_xy', Goto_xywz, move_robot)
     	rospy.loginfo("Beginning goto_xy service")
     	rospy.spin()
 
